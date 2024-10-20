@@ -45,7 +45,7 @@ Ensure that the following dependencies are installed on your system:
 You can install the necessary dependencies using apt:
 ```bash
 sudo apt update
-sudo apt install -y   ros-humble-rclcpp   ros-humble-rosbag2-cpp   ros-humble-rosbag2-storage   libyaml-cpp-dev   libopencv-dev   ros-humble-cv-bridge   ros-humble-sensor-msgs   ros-humble-pcl-conversions   ros-humble-pcl-io   libpcl-dev   ros-humble-ament-index-cpp
+sudo apt install -y ros-humble-rclcpp ros-humble-rosbag2-cpp ros-humble-rosbag2-storage libyaml-cpp-dev libopencv-dev  ros-humble-cv-bridge ros-humble-sensor-msgs ros-humble-pcl-conversions ros-humble-pcl-ros libpcl-dev ros-humble-ament-index-cpp
 ```
 *Note: Replace 'humble' with your ROS 2 distribution if different.*
 
@@ -62,6 +62,7 @@ Replace the repository URL with the actual repository URL.
 Return to the root of your workspace and build the package using `colcon`:
 ```bash
 cd ~/ros2_ws
+source opt/ros/humble/setup.bash
 colcon build --packages-select ros2_bag_exporter
 ```
 

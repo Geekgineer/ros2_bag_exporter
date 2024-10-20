@@ -1,5 +1,3 @@
-bag_path: "/path/to/your.bag"
-
 # Configuration for processing ROS2 bag files
 # This file specifies the paths, storage format, and topics to extract from the ROS bag.
 
