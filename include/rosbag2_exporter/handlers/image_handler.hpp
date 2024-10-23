@@ -38,32 +38,47 @@ public:
 
   // Handle uncompressed image messages
   void process_message(const rclcpp::SerializedMessage & serialized_msg,
-                      const std::string & topic,
-                      size_t index) override
+                     const std::string & topic,
+                     size_t index) override
   {
-    // Deserialize the incoming uncompressed image message
-    sensor_msgs::msg::Image img;
-    rclcpp::Serialization<sensor_msgs::msg::Image> serializer;
-    serializer.deserialize_message(&serialized_msg, &img);
+      // Deserialize the incoming uncompressed image message
+      sensor_msgs::msg::Image img;
+      rclcpp::Serialization<sensor_msgs::msg::Image> serializer;
+      serializer.deserialize_message(&serialized_msg, &img);
 
-    // Convert the sensor message to a cv::Mat image using cv_bridge
-    cv_bridge::CvImagePtr cv_ptr;
-    try {
-      cv_ptr = cv_bridge::toCvCopy(img, encoding_);
-    } catch (const cv_bridge::Exception & e) {
-      RCLCPP_ERROR(logger_, "CV Bridge exception: %s. Using default encoding 'rgb8'.", e.what());
-
-      // Attempt to fallback to the default 'rgb8' encoding
+      // Convert the sensor message to a cv::Mat image using cv_bridge
+      cv_bridge::CvImagePtr cv_ptr;
       try {
-        cv_ptr = cv_bridge::toCvCopy(img, "rgb8");
-        encoding_ = "rgb8";  // Update to fallback encoding
-      } catch (const cv_bridge::Exception & e2) {
-        RCLCPP_ERROR(logger_, "Fallback to 'rgb8' failed: %s", e2.what());
-        return;
-      }
-    }
+          cv_ptr = cv_bridge::toCvCopy(img, encoding_);
+      } catch (const cv_bridge::Exception & e) {
+          RCLCPP_ERROR(logger_, "CV Bridge exception: %s. Using default encoding 'rgb8'.", e.what());
 
-    save_image(cv_ptr->image, topic, img.header.stamp);
+          // Attempt to fallback to the default 'rgb8' encoding
+          try {
+              cv_ptr = cv_bridge::toCvCopy(img, "rgb8");
+              encoding_ = "rgb8";  // Update to fallback encoding
+          } catch (const cv_bridge::Exception & e2) {
+              RCLCPP_ERROR(logger_, "Fallback to 'rgb8' failed: %s", e2.what());
+              return;
+          }
+      }
+
+      // Apply color conversion based on encoding
+      if (encoding_ == "rgb8") {
+          // Convert from RGB to BGR for saving with OpenCV (OpenCV uses BGR)
+          cv::cvtColor(cv_ptr->image, cv_ptr->image, cv::COLOR_RGB2BGR);
+      } else if (encoding_ == "bgr8") {
+          // No conversion needed, OpenCV already uses BGR format
+          RCLCPP_INFO(logger_, "Image is already in 'bgr8', no conversion applied.");
+      } else if (encoding_ == "mono8" || encoding_ == "mono16") {
+          // Grayscale images (mono8 or mono16), no color conversion needed
+          RCLCPP_INFO(logger_, "Image is grayscale (%s), no color conversion applied.", encoding_.c_str());
+      } else {
+          RCLCPP_WARN(logger_, "Unsupported image encoding '%s'. Skipping color conversion.", encoding_.c_str());
+      }
+
+      // Save the image to file
+      save_image(cv_ptr->image, topic, img.header.stamp);
   }
 
   // Handle compressed image messages
