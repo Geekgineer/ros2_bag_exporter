@@ -12,9 +12,7 @@ namespace rosbag2_exporter
 BagExporter::BagExporter(const rclcpp::NodeOptions & options)
 : Node("rosbag2_exporter", options)
 {
-  // Declare and get the config_file parameter (relative to package share)
-  std::string config_file_param = this->declare_parameter<std::string>("config_file", "exporter_config.yaml");
-  
+
   // Find the package share directory
   std::string package_share_directory;
   try {
@@ -25,9 +23,10 @@ BagExporter::BagExporter(const rclcpp::NodeOptions & options)
       return;
   }
     
-  // Construct the absolute path to the config file
-  std::string config_file = package_share_directory + "/" + config_file_param;
-  
+  // Declare and get the config_file parameter (absolute path)
+  std::string config_file = this->declare_parameter<std::string>(
+      "config_file", package_share_directory + "/config/exporter_config.yaml");
+
   // Load configuration
   load_configuration(config_file);
 
@@ -59,6 +58,9 @@ void BagExporter::load_configuration(const std::string & config_file)
         tc.type = MessageType::PointCloud2;
       } else if (type == "Image") {
         tc.type = MessageType::Image;
+        tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
+      } else if (type == "CompressedImage") {
+        tc.type = MessageType::CompressedImage;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
       } else if (type == "DepthImage") {
         tc.type = MessageType::DepthImage;
@@ -103,6 +105,9 @@ void BagExporter::setup_handlers()
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::Image) {
       auto handler = std::make_shared<ImageHandler>(topic_dir, topic.encoding, this->get_logger());
+      handlers_[topic.name] = Handler{handler, 0};
+    } else if (topic.type == MessageType::CompressedImage) {
+      auto handler = std::make_shared<CompressedImageHandler>(topic_dir, topic.encoding, this->get_logger());
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::DepthImage) {
       auto handler = std::make_shared<DepthImageHandler>(topic_dir, topic.encoding, this->get_logger());

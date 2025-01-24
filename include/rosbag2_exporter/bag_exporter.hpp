@@ -9,6 +9,7 @@
 #include "rosbag2_exporter/handlers/base_handler.hpp"
 #include "rosbag2_exporter/handlers/pointcloud_handler.hpp"
 #include "rosbag2_exporter/handlers/image_handler.hpp"
+#include "rosbag2_exporter/handlers/compressed_image_handler.hpp"
 #include "rosbag2_exporter/handlers/depth_image_handler.hpp"
 #include "rosbag2_exporter/handlers/ir_image_handler.hpp"
 #include "rosbag2_exporter/handlers/laser_scan_handler.hpp"
@@ -38,6 +39,7 @@ enum class MessageType
   PointCloud2,
   LaserScan,
   Image,
+  CompressedImage,
   DepthImage,
   IRImage,
   IMU,
