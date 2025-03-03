@@ -38,6 +38,7 @@ enum class MessageType
   PointCloud2,
   LaserScan,
   Image,
+  CompressedImage,
   DepthImage,
   IRImage,
   IMU,

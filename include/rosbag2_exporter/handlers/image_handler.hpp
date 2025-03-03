@@ -20,11 +20,13 @@ namespace rosbag2_exporter
 
 class ImageHandler : public BaseHandler
 {
+    bool compressed_;
 public:
   // Constructor to accept logger and encoding, with a default value for encoding
   ImageHandler(const std::string & output_dir,
                const std::string & encoding,
-               rclcpp::Logger logger)
+               rclcpp::Logger logger, 
+	             bool compressed)
   : BaseHandler(logger), output_dir_(output_dir)
   {
     // Validate or set default encoding if not provided
@@ -34,6 +36,7 @@ public:
     } else {
       encoding_ = encoding;
     }
+      compressed_ = compressed;
   }
 
   // Handle uncompressed image messages
@@ -41,6 +44,9 @@ public:
                      const std::string & topic,
                      size_t index) override
   {
+      if (compressed_){
+      	return process_compressed_message(serialized_msg, topic, index);
+      }
       // Deserialize the incoming uncompressed image message
       sensor_msgs::msg::Image img;
       rclcpp::Serialization<sensor_msgs::msg::Image> serializer;
