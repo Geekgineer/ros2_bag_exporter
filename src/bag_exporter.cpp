@@ -60,6 +60,9 @@ void BagExporter::load_configuration(const std::string & config_file)
       } else if (type == "Image") {
         tc.type = MessageType::Image;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
+      } else if (type == "CompressedImage") {
+        tc.type = MessageType::CompressedImage;
+        tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
       } else if (type == "DepthImage") {
         tc.type = MessageType::DepthImage;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "16UC1"; // default encoding
@@ -102,7 +105,12 @@ void BagExporter::setup_handlers()
       auto handler = std::make_shared<PointCloudHandler>(topic_dir, this->get_logger());
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::Image) {
-      auto handler = std::make_shared<ImageHandler>(topic_dir, topic.encoding, this->get_logger());
+      const bool compressed = false;
+      auto handler = std::make_shared<ImageHandler>(topic_dir, topic.encoding, this->get_logger(), compressed);
+      handlers_[topic.name] = Handler{handler, 0};
+    } else if (topic.type == MessageType::CompressedImage) {
+      const bool compressed = true;
+      auto handler = std::make_shared<ImageHandler>(topic_dir, topic.encoding, this->get_logger(), compressed);
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::DepthImage) {
       auto handler = std::make_shared<DepthImageHandler>(topic_dir, topic.encoding, this->get_logger());

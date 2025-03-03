@@ -24,6 +24,12 @@ topics:
     sample_interval: 5          # Write one sample every 5 messages
 
   # Configuration for the RGB image topic
+  - name: "/rgb_compressed_image_topic"    # Name of the topic to extract
+    type: "CompressedImage"               # Data type of the topic
+    encoding: "rgb8"            # Encoding format for the image
+    sample_interval: 5          # Write one sample every 5 messages
+
+  # Configuration for the RGB image topic
   - name: "/ir_image_topic"    # Name of the topic to extract
     type: "IRImage"               # Data type of the topic
     encoding: "mono16"            # Encoding format for the IR image
