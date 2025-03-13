@@ -13,6 +13,7 @@ ROS2 Bag Exporter is a versatile ROS 2 (Humble Hawksbill) c++ package designed t
 #### Support for Multiple Message Types:
 - **PointCloud2**: Export point cloud data to PCD files.
 - **Image**: Convert image messages to PNG format.
+- **CompressedImage**: Convert image messages to JPG or PNG format.
 - **IR Image**: Convert IR image messages to PNG format.
 - **DepthImage**: Export depth images with appropriate encoding.
 - **LaserScan**: Export laser scan data.
@@ -89,6 +90,9 @@ topics:
   - name: "/camera/color/image_raw"
     type: "Image"
     encoding: "rgb8"
+    sample_interval: 5   # Write one sample every 5 messages
+  - name: "/camera/color/image_raw/compressed"
+    type: "CompressedImage"
     sample_interval: 5   # Write one sample every 5 messages
   - name: "/imu_topic"
     type: "IMU"
