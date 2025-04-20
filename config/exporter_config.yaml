@@ -49,3 +49,8 @@ topics:
   - name: "/gps_topic"              # Name of the topic to extract
     type: "GPS"                     # Data type of the topic
     sample_interval: 1              # Write every message
+
+  # Configuration for the path topic
+  - name: "/path"                  # Name of the topic to extract
+    type: "Path"                   # Data type of the topic
+    sample_interval: 1             # Write one sample every 10 messages
