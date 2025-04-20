@@ -46,7 +46,7 @@ Ensure that the following dependencies are installed on your system:
 You can install the necessary dependencies using apt:
 ```bash
 sudo apt update
-sudo apt install -y ros-humble-rclcpp ros-humble-rosbag2-cpp ros-humble-rosbag2-storage libyaml-cpp-dev libopencv-dev  ros-humble-cv-bridge ros-humble-sensor-msgs ros-humble-pcl-conversions ros-humble-pcl-ros libpcl-dev ros-humble-ament-index-cpp
+sudo apt install -y ros-humble-rclcpp ros-humble-rosbag2-cpp ros-humble-rosbag2-storage libyaml-cpp-dev libopencv-dev ros-humble-cv-bridge ros-humble-sensor-msgs ros-humble-pcl-conversions ros-humble-pcl-ros libpcl-dev ros-humble-ament-index-cpp ros-humble-nav-msgs 
 ```
 *Note: Replace 'humble' with your ROS 2 distribution if different.*
 
@@ -55,7 +55,7 @@ sudo apt install -y ros-humble-rclcpp ros-humble-rosbag2-cpp ros-humble-rosbag2-
 Navigate to your ROS 2 workspace's `src` directory and clone the `ros2_bag_exporter` repository:
 ```bash
 cd ~/ros2_ws/src
-git clone https://github.com/yourusername/ros2_bag_exporter.git
+git clone https://github.com/Geekgineer/ros2_bag_exporter.git
 ```
 Replace the repository URL with the actual repository URL.
 
@@ -103,6 +103,9 @@ topics:
   - name: "/lidar/points"
     type: "PointCloud2"
     sample_interval: 10   # Write one sample every 10 messages
+  - name: "/path"                  
+    type: "Path"                   
+    sample_interval: 1    # Write one sample every single messages
 ```
 
 ### Parameter Descriptions
@@ -150,6 +153,9 @@ topics:
   - name: "/lidar/points"
     type: "PointCloud2"
     sample_interval: 10
+  - name: "/path"                  
+    type: "Path"                   
+    sample_interval: 1
 ```
 
 ### 2. Running the Exporter

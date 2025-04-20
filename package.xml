@@ -21,7 +21,7 @@
   <depend>pcl_io</depend>
   <depend>opencv</depend>
   <depend>ament_index_cpp</depend>
-
+  <depend>nav_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

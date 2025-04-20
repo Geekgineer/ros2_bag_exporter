@@ -15,6 +15,7 @@
 #include "rosbag2_exporter/handlers/laser_scan_handler.hpp"
 #include "rosbag2_exporter/handlers/imu_handler.hpp"
 #include "rosbag2_exporter/handlers/gps_handler.hpp"
+#include "rosbag2_exporter/handlers/path_handler.hpp"
 
 #include <yaml-cpp/yaml.h>
 #include <filesystem>
@@ -44,6 +45,7 @@ enum class MessageType
   IRImage,
   IMU,
   GPS,
+  Path,
   Unknown
 };
 

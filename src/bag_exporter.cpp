@@ -72,6 +72,8 @@ void BagExporter::load_configuration(const std::string & config_file)
         tc.type = MessageType::GPS;
       } else if (type == "LaserScan") {
         tc.type = MessageType::LaserScan;
+      } else if (type == "Path") {
+        tc.type = MessageType::Path;
       } else {
         tc.type = MessageType::Unknown;
       }
@@ -124,6 +126,9 @@ void BagExporter::setup_handlers()
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::LaserScan) {
       auto handler = std::make_shared<LaserScanHandler>(topic_dir, this->get_logger());
+      handlers_[topic.name] = Handler{handler, 0};
+    } else if (topic.type == MessageType::Path) {
+      auto handler = std::make_shared<PathHandler>(topic_dir, this->get_logger());
       handlers_[topic.name] = Handler{handler, 0};
     } else {
       RCLCPP_WARN(this->get_logger(), "Unsupported message type for topic '%s'. Skipping.", topic.name.c_str());

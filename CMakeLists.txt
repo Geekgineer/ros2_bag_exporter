@@ -22,7 +22,7 @@ find_package(cv_bridge REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(ament_index_cpp REQUIRED)
-
+find_package(nav_msgs REQUIRED)
 
 # Include directories
 include_directories(
@@ -50,6 +50,7 @@ ament_target_dependencies(bag_exporter
   cv_bridge
   OpenCV
   yaml-cpp
+  nav_msgs
 )
 
 target_link_libraries(bag_exporter
