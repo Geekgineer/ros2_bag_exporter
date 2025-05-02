@@ -1,4 +1,3 @@
-
 # ROS2 Bag Exporter
 
 ![ROS2 Bag Exporter](img/cover.png)
@@ -103,6 +102,7 @@ topics:
   - name: "/lidar/points"
     type: "PointCloud2"
     sample_interval: 10   # Write one sample every 10 messages
+    save_mode: "auto"    # Optional: "intensity", "rgb", "rgba", or "auto" (default: auto)
   - name: "/path"                  
     type: "Path"                   
     sample_interval: 1    # Write one sample every single messages
@@ -118,6 +118,11 @@ topics:
   - **name**: The ROS 2 topic name.
   - **type**: The message type (PointCloud2, Image, DepthImage, IMU, GPS, etc.).
   - **sample_interval**: The interval at which messages will be written (e.g., 100 for every 100 messages).
+  - **save_mode** (PointCloud2 only, optional):
+    - `"intensity"`: Save PCD with intensity field (if present).
+    - `"rgb"`: Save PCD with RGB color (if present).
+    - `"rgba"`: Save PCD with RGBA color (if present).
+    - `"auto"` (default): Prefer intensity if present, then RGB, then RGBA, then XYZ only.
 
 ## Usage
 After building and sourcing the workspace, run the `bag_exporter` node using the following command:
@@ -153,6 +158,7 @@ topics:
   - name: "/lidar/points"
     type: "PointCloud2"
     sample_interval: 10
+    save_mode: "auto"
   - name: "/path"                  
     type: "Path"                   
     sample_interval: 1

@@ -16,6 +16,7 @@ topics:
   - name: "/pointcloud_topic"   # Name of the topic to extract
     type: "PointCloud2"         # Data type of the topic
     sample_interval: 10         # Write one sample every 10 messages
+    save_mode: "auto"           # Auto, prefer intensity > rgb > rgba if available
 
   # Configuration for the RGB image topic
   - name: "/rgb_image_topic"    # Name of the topic to extract

@@ -14,7 +14,7 @@ BagExporter::BagExporter(const rclcpp::NodeOptions & options)
 {
   // Declare and get the config_file parameter (relative to package share)
   std::string config_file_param = this->declare_parameter<std::string>("config_file", "exporter_config.yaml");
-  
+
   // Find the package share directory
   std::string package_share_directory;
   try {
@@ -24,10 +24,10 @@ BagExporter::BagExporter(const rclcpp::NodeOptions & options)
       rclcpp::shutdown();
       return;
   }
-    
+
   // Construct the absolute path to the config file
   std::string config_file = package_share_directory + "/" + config_file_param;
-  
+
   // Load configuration
   load_configuration(config_file);
 
@@ -57,12 +57,13 @@ void BagExporter::load_configuration(const std::string & config_file)
 
       if (type == "PointCloud2") {
         tc.type = MessageType::PointCloud2;
+        tc.save_mode = topic["save_mode"] ? topic["save_mode"].as<std::string>() : "auto"; // default to auto
       } else if (type == "Image") {
         tc.type = MessageType::Image;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
       } else if (type == "CompressedImage") {
         tc.type = MessageType::CompressedImage;
-        tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default 
+        tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default
       } else if (type == "DepthImage") {
         tc.type = MessageType::DepthImage;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "16UC1"; // default encoding
@@ -104,7 +105,7 @@ void BagExporter::setup_handlers()
 
     // Initialize handler based on message type
     if (topic.type == MessageType::PointCloud2) {
-      auto handler = std::make_shared<PointCloudHandler>(topic_dir, this->get_logger());
+      auto handler = std::make_shared<PointCloudHandler>(topic_dir, topic.save_mode, this->get_logger());
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::Image) {
       auto handler = std::make_shared<ImageHandler>(topic_dir, topic.encoding, this->get_logger());
@@ -196,8 +197,8 @@ void BagExporter::export_bag()
           rclcpp::SerializedMessage ser_msg;
           size_t buffer_length = serialized_msg->serialized_data->buffer_length;
           ser_msg.reserve(buffer_length);
-          std::memcpy(ser_msg.get_rcl_serialized_message().buffer, 
-                      serialized_msg->serialized_data->buffer, 
+          std::memcpy(ser_msg.get_rcl_serialized_message().buffer,
+                      serialized_msg->serialized_data->buffer,
                       buffer_length);
           ser_msg.get_rcl_serialized_message().buffer_length = buffer_length;
 
