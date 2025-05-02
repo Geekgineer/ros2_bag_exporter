@@ -55,7 +55,7 @@ struct TopicConfig
   MessageType type;
   std::string encoding;
   int sample_interval;
-  std::string save_mode; // "intensity", "rgb", or "auto" (default)
+  std::string save_mode;
 };
 
 struct Handler
