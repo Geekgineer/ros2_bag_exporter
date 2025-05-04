@@ -107,7 +107,10 @@ topics:
     sample_interval: 10   # Write one sample every 10 messages
   - name: "/path"                  
     type: "Path"                   
-    sample_interval: 1    # Write one sample every single messages
+    sample_interval: 1    # Write one sample every single message
+  - name: "/odom"                  
+    type: "Odometry"               
+    sample_interval: 1    # Write one sample every single message
 ```
 
 ### Parameter Descriptions
@@ -157,6 +160,9 @@ topics:
     sample_interval: 10
   - name: "/path"                  
     type: "Path"                   
+    sample_interval: 1
+  - name: "/odom"                  
+    type: "Odometry"               
     sample_interval: 1
 ```
 
