@@ -84,4 +84,4 @@ private:
 
 }  // namespace rosbag2_exporter
 
-#endif  // ROSBAG2_EXPORTER__BAG_EXPORTER_HPP_https://github.com/barcesat/ros2_bag_exporter.git
+#endif  // ROSBAG2_EXPORTER__BAG_EXPORTER_HPP
