@@ -14,7 +14,7 @@ BagExporter::BagExporter(const rclcpp::NodeOptions & options)
 {
   // Declare and get the config_file parameter (relative to package share)
   std::string config_file_param = this->declare_parameter<std::string>("config_file", "exporter_config.yaml");
-  
+
   // Find the package share directory
   std::string package_share_directory;
   try {
@@ -24,10 +24,10 @@ BagExporter::BagExporter(const rclcpp::NodeOptions & options)
       rclcpp::shutdown();
       return;
   }
-    
+
   // Construct the absolute path to the config file
   std::string config_file = package_share_directory + "/" + config_file_param;
-  
+
   // Load configuration
   load_configuration(config_file);
 
@@ -62,7 +62,7 @@ void BagExporter::load_configuration(const std::string & config_file)
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
       } else if (type == "CompressedImage") {
         tc.type = MessageType::CompressedImage;
-        tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default 
+        tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default
       } else if (type == "DepthImage") {
         tc.type = MessageType::DepthImage;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "16UC1"; // default encoding
@@ -74,6 +74,8 @@ void BagExporter::load_configuration(const std::string & config_file)
         tc.type = MessageType::LaserScan;
       } else if (type == "Path") {
         tc.type = MessageType::Path;
+      } else if (type == "Odometry") {
+        tc.type = MessageType::Odometry;
       } else {
         tc.type = MessageType::Unknown;
       }
@@ -129,6 +131,9 @@ void BagExporter::setup_handlers()
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::Path) {
       auto handler = std::make_shared<PathHandler>(topic_dir, this->get_logger());
+      handlers_[topic.name] = Handler{handler, 0};
+    } else if (topic.type == MessageType::Odometry) {
+      auto handler = std::make_shared<OdometryHandler>(topic_dir, this->get_logger());
       handlers_[topic.name] = Handler{handler, 0};
     } else {
       RCLCPP_WARN(this->get_logger(), "Unsupported message type for topic '%s'. Skipping.", topic.name.c_str());
@@ -196,8 +201,8 @@ void BagExporter::export_bag()
           rclcpp::SerializedMessage ser_msg;
           size_t buffer_length = serialized_msg->serialized_data->buffer_length;
           ser_msg.reserve(buffer_length);
-          std::memcpy(ser_msg.get_rcl_serialized_message().buffer, 
-                      serialized_msg->serialized_data->buffer, 
+          std::memcpy(ser_msg.get_rcl_serialized_message().buffer,
+                      serialized_msg->serialized_data->buffer,
                       buffer_length);
           ser_msg.get_rcl_serialized_message().buffer_length = buffer_length;
 
