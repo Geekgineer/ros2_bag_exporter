@@ -16,6 +16,7 @@
 #include "rosbag2_exporter/handlers/imu_handler.hpp"
 #include "rosbag2_exporter/handlers/gps_handler.hpp"
 #include "rosbag2_exporter/handlers/path_handler.hpp"
+#include "rosbag2_exporter/handlers/odometry_handler.hpp"
 
 #include <yaml-cpp/yaml.h>
 #include <filesystem>
@@ -46,6 +47,7 @@ enum class MessageType
   IMU,
   GPS,
   Path,
+  Odometry,
   Unknown
 };
 
@@ -82,4 +84,4 @@ private:
 
 }  // namespace rosbag2_exporter
 
-#endif  // ROSBAG2_EXPORTER__BAG_EXPORTER_HPP_
+#endif  // ROSBAG2_EXPORTER__BAG_EXPORTER_HPP

@@ -54,3 +54,8 @@ topics:
   - name: "/path"                  # Name of the topic to extract
     type: "Path"                   # Data type of the topic
     sample_interval: 1             # Write one sample every 10 messages
+
+  # Configuration for the odometry topic
+  - name: "/odom"                  # Name of the topic to extract
+    type: "Odometry"               # Data type of the topic
+    sample_interval: 1             # Write one sample every 10 messages

@@ -19,6 +19,8 @@ ROS2 Bag Exporter is a versatile ROS 2 (Humble Hawksbill) c++ package designed t
 - **LaserScan**: Export laser scan data.
 - **IMU**: Export IMU data for inertial measurement analysis.
 - **GPS**: Export GPS coordinates and data.
+- **Path**: Export path mesage type to CSV file (timestamp.sec,timestamp.nanosec,frame_id,pose_stamped.timestamp.sec,pose_stamped.timestamp.nanosec,pose_stamped.frame_id,pose_stamped.pose.position.x,pose_stamped.pose.position.y,pose_stamped.pose.position.z,pose_stamped.pose.orientation.x,pose_stamped.pose.orientation.y,pose_stamped.pose.orientation.z,pose_stamped.pose.orientation.w).
+- **Odometry**: Export odometry mesage type to CSV file (msg_timestamp_sec,msg_timestamp_nanosec,msg_frame_id, pos_x,pos_y,pos_z,orient_x,orient_y,orient_z,orient_w,linear_vel_x,linear_vel_y,linear_vel_z,angular_vel_x,angular_vel_y,angular_vel_z).
 
 #### Configurable Export Settings:
 - Define input bag files, output directories, and storage formats via a YAML configuration file.
@@ -105,7 +107,10 @@ topics:
     sample_interval: 10   # Write one sample every 10 messages
   - name: "/path"                  
     type: "Path"                   
-    sample_interval: 1    # Write one sample every single messages
+    sample_interval: 1    # Write one sample every single message
+  - name: "/odom"                  
+    type: "Odometry"               
+    sample_interval: 1    # Write one sample every single message
 ```
 
 ### Parameter Descriptions
@@ -155,6 +160,9 @@ topics:
     sample_interval: 10
   - name: "/path"                  
     type: "Path"                   
+    sample_interval: 1
+  - name: "/odom"                  
+    type: "Odometry"               
     sample_interval: 1
 ```
 
