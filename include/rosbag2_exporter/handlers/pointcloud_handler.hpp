@@ -21,9 +21,9 @@ namespace rosbag2_exporter
 class PointCloudHandler : public BaseHandler
 {
 public:
-  // Constructor to accept logger
-  PointCloudHandler(const std::string & output_dir, rclcpp::Logger logger)
-  : BaseHandler(logger), output_dir_(output_dir)
+  // Constructor to accept logger and save_mode
+  PointCloudHandler(const std::string & output_dir, const std::string & save_mode, rclcpp::Logger logger)
+  : BaseHandler(logger), output_dir_(output_dir), save_mode_(save_mode)
   {}
 
   void process_message(const rclcpp::SerializedMessage & serialized_msg,
@@ -34,29 +34,46 @@ public:
     rclcpp::Serialization<sensor_msgs::msg::PointCloud2> serializer;
     serializer.deserialize_message(&serialized_msg, &pc2);
 
-    // Check if the point cloud has an intensity field
+    // Check for fields
     bool has_intensity = false;
+    bool has_rgb = false;
+    bool has_rgba = false;
     for (const auto& field : pc2.fields) {
-      if (field.name == "intensity") {
-        has_intensity = true;
-        break;
-      }
+      if (field.name == "intensity") has_intensity = true;
+      if (field.name == "rgb") has_rgb = true;
+      if (field.name == "rgba") has_rgba = true;
     }
 
-    // Create the point cloud and convert based on whether intensity is present
-    if (has_intensity) {
+    std::string mode = save_mode_;
+    if (mode == "auto") {
+      if (has_intensity) mode = "intensity";
+      else if (has_rgb) mode = "rgb";
+      else if (has_rgba) mode = "rgba";
+      else mode = "xyz";
+    }
+
+    if (mode == "intensity" && has_intensity) {
       pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
       pcl::fromROSMsg(pc2, *cloud);
-      save_pointcloud_to_file<pcl::PointXYZI>(cloud, topic, pc2, index);  // Explicitly specify template type
+      save_pointcloud_to_file<pcl::PointXYZI>(cloud, topic, pc2, index);
+    } else if (mode == "rgb" && has_rgb) {
+      pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+      pcl::fromROSMsg(pc2, *cloud);
+      save_pointcloud_to_file<pcl::PointXYZRGB>(cloud, topic, pc2, index);
+    } else if (mode == "rgba" && has_rgba) {
+      pcl::PointCloud<pcl::PointXYZRGBA>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGBA>);
+      pcl::fromROSMsg(pc2, *cloud);
+      save_pointcloud_to_file<pcl::PointXYZRGBA>(cloud, topic, pc2, index);
     } else {
       pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
       pcl::fromROSMsg(pc2, *cloud);
-      save_pointcloud_to_file<pcl::PointXYZ>(cloud, topic, pc2, index);  // Explicitly specify template type
+      save_pointcloud_to_file<pcl::PointXYZ>(cloud, topic, pc2, index);
     }
   }
 
 private:
   std::string output_dir_;
+  std::string save_mode_;
 
   // Templated function to save point cloud to file
   template<typename PointT>

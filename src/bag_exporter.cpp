@@ -57,6 +57,7 @@ void BagExporter::load_configuration(const std::string & config_file)
 
       if (type == "PointCloud2") {
         tc.type = MessageType::PointCloud2;
+        tc.save_mode = topic["save_mode"] ? topic["save_mode"].as<std::string>() : "auto"; // default to auto
       } else if (type == "Image") {
         tc.type = MessageType::Image;
         tc.encoding = topic["encoding"] ? topic["encoding"].as<std::string>() : "rgb8"; // default encoding
@@ -106,7 +107,7 @@ void BagExporter::setup_handlers()
 
     // Initialize handler based on message type
     if (topic.type == MessageType::PointCloud2) {
-      auto handler = std::make_shared<PointCloudHandler>(topic_dir, this->get_logger());
+      auto handler = std::make_shared<PointCloudHandler>(topic_dir, topic.save_mode, this->get_logger());
       handlers_[topic.name] = Handler{handler, 0};
     } else if (topic.type == MessageType::Image) {
       auto handler = std::make_shared<ImageHandler>(topic_dir, topic.encoding, this->get_logger());

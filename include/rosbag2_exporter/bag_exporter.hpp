@@ -57,6 +57,7 @@ struct TopicConfig
   MessageType type;
   std::string encoding;
   int sample_interval;
+  std::string save_mode;
 };
 
 struct Handler
