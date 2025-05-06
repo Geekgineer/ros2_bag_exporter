@@ -20,8 +20,8 @@ class LaserScanHandler : public BaseHandler
 {
 public:
   // Constructor to accept logger
-  LaserScanHandler(const std::string & output_dir, rclcpp::Logger logger)
-  : BaseHandler(logger), output_dir_(output_dir)
+  LaserScanHandler(const std::string & topic_dir, rclcpp::Logger logger)
+  : BaseHandler(logger), topic_dir_(topic_dir)
   {}
 
   void process_message(const rclcpp::SerializedMessage & serialized_msg,
@@ -46,10 +46,10 @@ public:
     }
 
     // Create the full file path with '.csv' as the extension
-    std::string filepath = output_dir_ + "/" + sanitized_topic + "/" + timestamp + ".csv";
+    std::string filepath = topic_dir_ + "/" + timestamp + ".csv";
 
     // Ensure the directory exists, create if necessary
-    std::filesystem::path dir_path = output_dir_ + "/" + sanitized_topic;
+    std::filesystem::path dir_path = topic_dir_;
     if (!std::filesystem::exists(dir_path)) {
       RCLCPP_INFO(logger_, "Creating directory: %s", dir_path.c_str());
       std::filesystem::create_directories(dir_path);
@@ -95,7 +95,7 @@ public:
   }
 
 private:
-  std::string output_dir_;
+  std::string topic_dir_;
 };
 
 }  // namespace rosbag2_exporter

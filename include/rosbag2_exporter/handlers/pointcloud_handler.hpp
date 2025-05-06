@@ -22,8 +22,8 @@ class PointCloudHandler : public BaseHandler
 {
 public:
   // Constructor to accept logger
-  PointCloudHandler(const std::string & output_dir, rclcpp::Logger logger)
-  : BaseHandler(logger), output_dir_(output_dir)
+  PointCloudHandler(const std::string & topic_dir, rclcpp::Logger logger)
+  : BaseHandler(logger), topic_dir_(topic_dir)
   {}
 
   void process_message(const rclcpp::SerializedMessage & serialized_msg,
@@ -56,7 +56,7 @@ public:
   }
 
 private:
-  std::string output_dir_;
+  std::string topic_dir_;
 
   // Templated function to save point cloud to file
   template<typename PointT>
@@ -74,16 +74,19 @@ private:
     // Log the processing
     RCLCPP_INFO(logger_, "Processing PointCloud2 message at timestamp: %s #%zu", timestamp.c_str(), index);
 
-    // Ensure the directory exists
-    std::string topic_dir = output_dir_ + "/" + topic.substr(1);
-    std::filesystem::create_directories(topic_dir);
+    // Create the full file path
+    std::string filepath = topic_dir_ + "/" + timestamp + ".pcd";
 
-    // Construct filename
-    std::string filename = topic_dir + "/" + timestamp + ".pcd";
+    // Ensure the directory exists, create if necessary
+    std::filesystem::path dir_path = topic_dir_;
+    if (!std::filesystem::exists(dir_path)) {
+        RCLCPP_INFO(logger_, "Creating directory: %s", dir_path.c_str());
+        std::filesystem::create_directories(dir_path);
+    }
 
     // Save the point cloud
-    if (pcl::io::savePCDFileBinary(filename, *cloud) == -1) {
-      RCLCPP_ERROR(logger_, "Failed to write PCD file to %s", filename.c_str());
+    if (pcl::io::savePCDFileBinary(filepath, *cloud) == -1) {
+      RCLCPP_ERROR(logger_, "Failed to write PCD file to %s", filepath.c_str());
     }
   }
 };

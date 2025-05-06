@@ -35,6 +35,16 @@
 namespace rosbag2_exporter
 {
 
+struct ExportProgress {
+    std::string topic_name;
+    size_t last_message_index;
+};
+
+struct ProgressFile {
+    std::string bag_path;
+    std::vector<ExportProgress> topic_progress;
+};
+
 enum class MessageType
 {
   PointCloud2,
@@ -72,12 +82,17 @@ private:
   void load_configuration(const std::string & config_file);
   void setup_handlers();
   void export_bag();
+  void save_progress();
+  void load_progress();
+  std::string get_progress_file_path();
 
   std::string bag_path_;
   std::string output_dir_;
   std::string storage_id_;
   std::vector<TopicConfig> topics_;
   std::map<std::string, Handler> handlers_;
+  ProgressFile progress_;
+  std::string progress_file_path_;
 };
 
 }  // namespace rosbag2_exporter
