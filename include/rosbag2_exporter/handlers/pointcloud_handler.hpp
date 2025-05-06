@@ -97,8 +97,8 @@ private:
     // Ensure the directory exists, create if necessary
     std::filesystem::path dir_path = topic_dir_;
     if (!std::filesystem::exists(dir_path)) {
-        RCLCPP_INFO(logger_, "Creating directory: %s", dir_path.c_str());
-        std::filesystem::create_directories(dir_path);
+      RCLCPP_INFO(logger_, "Creating directory: %s", dir_path.c_str());
+      std::filesystem::create_directories(dir_path);
     }
 
     // Save the point cloud
