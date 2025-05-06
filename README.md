@@ -86,7 +86,7 @@ storage_id: "sqlite3"  # Common storage ID; ensure it matches your bag's storage
 topics:
   - name: "/camera/depth/image_raw"
     type: "DepthImage"
-    encoding: "rgb8"    # Options: "rgb8" (default, color), "bgr8" (color), "mono8"/"8UC1" (grayscale), "16UC1" (raw depth)
+    encoding: "bgr8"    # Options: "bgr8" (default, color), "rgb" (color), "mono8"/"8UC1" (grayscale), "16UC1" (raw depth)
     sample_interval: 10  # Write one sample every 10 messages
   - name: "/camera/color/image_raw"
     type: "Image"
@@ -129,8 +129,8 @@ topics:
       - `"mono8"`: 8-bit grayscale
       - `"mono16"`: 16-bit grayscale
     - For DepthImage (supports visualization options):
-      - `"rgb8"`: Standard depth visualization (close=red, far=blue, matches RealSense and other common tools)
-      - `"bgr8"`: Inverse depth visualization (close=blue, far=red)
+      - `"bgr8"`: Standard depth visualization (close=blue, far=red)
+      - `"rgb8"`: Inverse depth visualization (close=red, far=blue)
       - `"16UC1"`: Raw depth values (best for quantitative analysis)
       - `"mono8"` or `"8UC1"`: Grayscale (dark=close, bright=far, standard convention)
       Note: Invalid/zero depth values appear as black in all visualization modes
@@ -160,7 +160,7 @@ storage_id: "sqlite3"
 topics:
   - name: "/camera/depth/image_raw"
     type: "DepthImage"
-    encoding: "rgb8"
+    encoding: "bgr8"
     sample_interval: 10
   - name: "/camera/color/image_raw"
     type: "Image"

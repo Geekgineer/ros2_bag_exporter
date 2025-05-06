@@ -33,7 +33,7 @@ topics:
   # Configuration for the depth image topic
   - name: "/depth_image_topic"  # Name of the topic to extract
     type: "DepthImage"          # Data type of the topic
-    encoding: "8UC1"            # Encoding format for the depth image
+    encoding: "bgr8"            # Encoding format for the depth image
     sample_interval: 2          # Write one sample every 2 messages
 
   # Configuration for the laser scan topic
