@@ -31,7 +31,7 @@ ROS2 Bag Exporter is a versatile ROS 2 (Humble Hawksbill) c++ package designed t
 #### Automatic Directory Management:
 - Automatically creates necessary directories for each topic based on the configuration.
 
-## Install 
+## Install
 ### Dependencies
 Ensure that the following dependencies are installed on your system:
 - ROS 2 Humble Hawksbill
@@ -47,7 +47,7 @@ Ensure that the following dependencies are installed on your system:
 You can install the necessary dependencies using apt:
 ```bash
 sudo apt update
-sudo apt install -y ros-humble-rclcpp ros-humble-rosbag2-cpp ros-humble-rosbag2-storage libyaml-cpp-dev libopencv-dev ros-humble-cv-bridge ros-humble-sensor-msgs ros-humble-pcl-conversions ros-humble-pcl-ros libpcl-dev ros-humble-ament-index-cpp ros-humble-nav-msgs 
+sudo apt install -y ros-humble-rclcpp ros-humble-rosbag2-cpp ros-humble-rosbag2-storage libyaml-cpp-dev libopencv-dev ros-humble-cv-bridge ros-humble-sensor-msgs ros-humble-pcl-conversions ros-humble-pcl-ros libpcl-dev ros-humble-ament-index-cpp ros-humble-nav-msgs
 ```
 *Note: Replace 'humble' with your ROS 2 distribution if different.*
 
@@ -86,11 +86,11 @@ storage_id: "sqlite3"  # Common storage ID; ensure it matches your bag's storage
 topics:
   - name: "/camera/depth/image_raw"
     type: "DepthImage"
-    encoding: "16UC1"
+    encoding: "8UC1"    # Options: "16UC1" (raw depth), "bgr8"/"rgb8" (color), "mono8"/"8UC1" (grayscale)
     sample_interval: 10  # Write one sample every 10 messages
   - name: "/camera/color/image_raw"
     type: "Image"
-    encoding: "rgb8"
+    encoding: "rgb8"     # Options: "rgb8" (default), "bgr8", "mono8", "mono16"
     sample_interval: 5   # Write one sample every 5 messages
   - name: "/camera/color/image_raw/compressed"
     type: "CompressedImage"
@@ -105,11 +105,11 @@ topics:
     type: "PointCloud2"
     sample_interval: 10   # Write one sample every 10 messages
     save_mode: "auto"    # Optional: "intensity", "rgb", "rgba", or "auto" (default: auto)
-  - name: "/path"                  
-    type: "Path"                   
+  - name: "/path"
+    type: "Path"
     sample_interval: 1    # Write one sample every single message
-  - name: "/odom"                  
-    type: "Odometry"               
+  - name: "/odom"
+    type: "Odometry"
     sample_interval: 1    # Write one sample every single message
 ```
 
@@ -122,6 +122,16 @@ topics:
 - **topics**: A list of topics to export. Each topic requires:
   - **name**: The ROS 2 topic name.
   - **type**: The message type (PointCloud2, Image, DepthImage, IMU, GPS, etc.).
+  - **encoding**: Format-specific encoding:
+    - For Image:
+      - `"rgb8"`: RGB color (default)
+      - `"bgr8"`: BGR color
+      - `"mono8"`: 8-bit grayscale
+      - `"mono16"`: 16-bit grayscale
+    - For DepthImage (supports visualization options):
+      - `"16UC1"`: Raw depth values (default, best for quantitative analysis)
+      - `"bgr8"` or `"rgb8"`: Colored visualization using JET colormap (red=close, blue=far)
+      - `"mono8"` or `"8UC1"`: Grayscale visualization (darker=closer, brighter=farther)
   - **sample_interval**: The interval at which messages will be written (e.g., 100 for every 100 messages).
   - **save_mode** (PointCloud2 only, optional):
     - `"intensity"`: Save PCD with intensity field (if present).
@@ -148,7 +158,7 @@ storage_id: "sqlite3"
 topics:
   - name: "/camera/depth/image_raw"
     type: "DepthImage"
-    encoding: "16UC1"
+    encoding: "8UC1"
     sample_interval: 10
   - name: "/camera/color/image_raw"
     type: "Image"
@@ -164,11 +174,11 @@ topics:
     type: "PointCloud2"
     sample_interval: 10
     save_mode: "auto"
-  - name: "/path"                  
-    type: "Path"                   
+  - name: "/path"
+    type: "Path"
     sample_interval: 1
-  - name: "/odom"                  
-    type: "Odometry"               
+  - name: "/odom"
+    type: "Odometry"
     sample_interval: 1
 ```
 
@@ -223,7 +233,7 @@ Contributions are welcome! Please follow the standard process:
 This project is licensed under the Apache License 2.0.
 
 ## Contact
-Maintainer: Abdalrahman M. Amer 
+Maintainer: Abdalrahman M. Amer
 
 Email: abdalrahman.m5959@gmail.com
 
