@@ -27,9 +27,9 @@
  class PathHandler : public BaseHandler
  {
  public:
-   // Constructor to accept output directory and logger
-   PathHandler(const std::string & output_dir, rclcpp::Logger logger)
-   : BaseHandler(logger), output_dir_(output_dir)
+   // Constructor to accept logger
+   PathHandler(const std::string & topic_dir, rclcpp::Logger logger)
+   : BaseHandler(logger), topic_dir_(topic_dir)
    {}
 
    // Override the process_message function for Path messages
@@ -55,7 +55,7 @@
      }
 
      // 4. Construct the directory path based on the topic
-     std::filesystem::path dir_path = output_dir_ + "/" + sanitized_topic;
+     std::filesystem::path dir_path = topic_dir_ + "/" + sanitized_topic;
 
      // 5. Ensure the directory exists, create if necessary
      if (!std::filesystem::exists(dir_path)) {
@@ -105,7 +105,7 @@
    }
 
  private:
-   std::string output_dir_; // Directory where files will be saved
+   std::string topic_dir_;
  };
 
  }  // namespace rosbag2_exporter
