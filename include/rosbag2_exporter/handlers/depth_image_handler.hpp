@@ -26,12 +26,21 @@ public:
                    rclcpp::Logger logger)
   : BaseHandler(logger), topic_dir_(topic_dir)
   {
-    // Validate or set default encoding if not provided
+    // Validate or set default encoding
     if (encoding.empty()) {
-      RCLCPP_WARN(logger, "No encoding provided. Defaulting to '16UC1'.");
-      encoding_ = "16UC1";  // Default encoding for depth images
+      RCLCPP_WARN(logger, "No encoding provided. Defaulting to 'rgb8' for standard depth visualization.");
+      encoding_ = "rgb8";  // Default to RGB8 for standard depth visualization (red=close, blue=far)
     } else {
       encoding_ = encoding;
+      if (encoding_ == "rgb8") {
+        RCLCPP_INFO(logger, "Using standard depth visualization (red=close, blue=far)");
+      } else if (encoding_ == "bgr8") {
+        RCLCPP_INFO(logger, "Using inverse depth visualization (blue=close, red=far)");
+      } else if (encoding_ == "16UC1") {
+        RCLCPP_INFO(logger, "Using raw depth values");
+      } else if (isGrayscaleEncoding(encoding_)) {
+        RCLCPP_INFO(logger, "Using grayscale visualization (bright=close, dark=far)");
+      }
     }
   }
 
@@ -58,6 +67,7 @@ public:
     }
 
     // Normalize to 0-255 range, keeping zero values as zero
+    // Standard convention: close objects (small depth values) map to dark values
     cv::Mat normalized;
     depth_img.convertTo(normalized, CV_8UC1, 255.0 / (max_val - min_val), -min_val * 255.0 / (max_val - min_val));
 

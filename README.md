@@ -86,7 +86,7 @@ storage_id: "sqlite3"  # Common storage ID; ensure it matches your bag's storage
 topics:
   - name: "/camera/depth/image_raw"
     type: "DepthImage"
-    encoding: "8UC1"    # Options: "16UC1" (raw depth), "bgr8"/"rgb8" (color), "mono8"/"8UC1" (grayscale)
+    encoding: "rgb8"    # Options: "rgb8" (default, color), "bgr8" (color), "mono8"/"8UC1" (grayscale), "16UC1" (raw depth)
     sample_interval: 10  # Write one sample every 10 messages
   - name: "/camera/color/image_raw"
     type: "Image"
@@ -122,16 +122,18 @@ topics:
 - **topics**: A list of topics to export. Each topic requires:
   - **name**: The ROS 2 topic name.
   - **type**: The message type (PointCloud2, Image, DepthImage, IMU, GPS, etc.).
-  - **encoding**: Format-specific encoding:
+  - **encoding** (for Image and DepthImage):
     - For Image:
       - `"rgb8"`: RGB color (default)
       - `"bgr8"`: BGR color
       - `"mono8"`: 8-bit grayscale
       - `"mono16"`: 16-bit grayscale
     - For DepthImage (supports visualization options):
-      - `"16UC1"`: Raw depth values (default, best for quantitative analysis)
-      - `"bgr8"` or `"rgb8"`: Colored visualization using JET colormap (red=close, blue=far)
-      - `"mono8"` or `"8UC1"`: Grayscale visualization (darker=closer, brighter=farther)
+      - `"rgb8"`: Standard depth visualization (close=red, far=blue, matches RealSense and other common tools)
+      - `"bgr8"`: Inverse depth visualization (close=blue, far=red)
+      - `"16UC1"`: Raw depth values (best for quantitative analysis)
+      - `"mono8"` or `"8UC1"`: Grayscale (dark=close, bright=far, standard convention)
+      Note: Invalid/zero depth values appear as black in all visualization modes
   - **sample_interval**: The interval at which messages will be written (e.g., 100 for every 100 messages).
   - **save_mode** (PointCloud2 only, optional):
     - `"intensity"`: Save PCD with intensity field (if present).
@@ -158,7 +160,7 @@ storage_id: "sqlite3"
 topics:
   - name: "/camera/depth/image_raw"
     type: "DepthImage"
-    encoding: "8UC1"
+    encoding: "rgb8"
     sample_interval: 10
   - name: "/camera/color/image_raw"
     type: "Image"
