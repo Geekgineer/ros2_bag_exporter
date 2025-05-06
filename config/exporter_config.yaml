@@ -16,6 +16,7 @@ topics:
   - name: "/pointcloud_topic"   # Name of the topic to extract
     type: "PointCloud2"         # Data type of the topic
     sample_interval: 10         # Write one sample every 10 messages
+    save_mode: "auto"           # Auto, prefer intensity > rgb > rgba if available
 
   # Configuration for the RGB image topic
   - name: "/rgb_image_topic"    # Name of the topic to extract
@@ -53,4 +54,9 @@ topics:
   # Configuration for the path topic
   - name: "/path"                  # Name of the topic to extract
     type: "Path"                   # Data type of the topic
+    sample_interval: 1             # Write one sample every 10 messages
+
+  # Configuration for the odometry topic
+  - name: "/odom"                  # Name of the topic to extract
+    type: "Odometry"               # Data type of the topic
     sample_interval: 1             # Write one sample every 10 messages
