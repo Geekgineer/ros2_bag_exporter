@@ -26,13 +26,69 @@ public:
                    rclcpp::Logger logger)
   : BaseHandler(logger), topic_dir_(topic_dir)
   {
-    // Validate or set default encoding if not provided
+    // Validate or set default encoding
     if (encoding.empty()) {
-      RCLCPP_WARN(logger, "No encoding provided. Defaulting to '16UC1'.");
-      encoding_ = "16UC1";  // Default encoding for depth images
+      RCLCPP_WARN(logger, "No encoding provided. Defaulting to 'rgb8' for standard depth visualization.");
+      encoding_ = "rgb8";  // Default to RGB8 for standard depth visualization (red=close, blue=far)
     } else {
       encoding_ = encoding;
+      if (encoding_ == "rgb8") {
+        RCLCPP_INFO(logger, "Using standard depth visualization (red=close, blue=far)");
+      } else if (encoding_ == "bgr8") {
+        RCLCPP_INFO(logger, "Using inverse depth visualization (blue=close, red=far)");
+      } else if (encoding_ == "16UC1") {
+        RCLCPP_INFO(logger, "Using raw depth values");
+      } else if (isGrayscaleEncoding(encoding_)) {
+        RCLCPP_INFO(logger, "Using grayscale visualization (bright=close, dark=far)");
+      }
     }
+  }
+
+  // Helper function to check if encoding is color (bgr8/rgb8)
+  bool isColorEncoding(const std::string & enc) {
+    return (enc == "bgr8" || enc == "rgb8");
+  }
+
+  // Helper function to check if encoding is grayscale (mono8/8UC1)
+  bool isGrayscaleEncoding(const std::string & enc) {
+    return (enc == "mono8" || enc == "8UC1");
+  }
+
+  // Convert depth image to visualization format
+  cv::Mat convertDepthToVisualization(const cv::Mat& depth_img) {
+    cv::Mat visualization;
+    double min_val, max_val;
+    cv::minMaxLoc(depth_img, &min_val, &max_val);
+
+    // Skip zero values in min/max computation for better normalization
+    cv::Mat mask = depth_img > 0;
+    if (cv::countNonZero(mask) > 0) {
+      cv::minMaxLoc(depth_img, &min_val, &max_val, nullptr, nullptr, mask);
+    }
+
+    // Normalize to 0-255 range, keeping zero values as zero
+    // Standard convention: close objects (small depth values) map to dark values
+    cv::Mat normalized;
+    depth_img.convertTo(normalized, CV_8UC1, 255.0 / (max_val - min_val), -min_val * 255.0 / (max_val - min_val));
+
+    if (isColorEncoding(encoding_)) {
+      // Apply colormap for color visualization
+      cv::applyColorMap(normalized, visualization, cv::COLORMAP_JET);
+
+      // Keep zero values as black
+      if (cv::countNonZero(mask) < depth_img.total()) {
+        visualization.setTo(cv::Vec3b(0,0,0), ~mask);
+      }
+
+      // Convert to RGB if needed
+      if (encoding_ == "rgb8") {
+        cv::cvtColor(visualization, visualization, cv::COLOR_BGR2RGB);
+      }
+    } else if (isGrayscaleEncoding(encoding_)) {
+      visualization = normalized;
+    }
+
+    return visualization;
   }
 
   void process_message(const rclcpp::SerializedMessage & serialized_msg,
@@ -47,18 +103,11 @@ public:
     // Convert the sensor message to a cv::Mat image using cv_bridge
     cv_bridge::CvImagePtr cv_ptr;
     try {
-      cv_ptr = cv_bridge::toCvCopy(img, encoding_);
+      // Always read as 16UC1 first to get raw depth data
+      cv_ptr = cv_bridge::toCvCopy(img, "16UC1");
     } catch (const cv_bridge::Exception & e) {
-      RCLCPP_ERROR(logger_, "CV Bridge exception: %s. Using default encoding '16UC1'.", e.what());
-
-      // Attempt to fallback to the default '16UC1' encoding
-      try {
-        cv_ptr = cv_bridge::toCvCopy(img, "16UC1");
-        encoding_ = "16UC1";  // Update to fallback encoding
-      } catch (const cv_bridge::Exception & e2) {
-        RCLCPP_ERROR(logger_, "Fallback to '16UC1' failed: %s", e2.what());
-        return;
-      }
+      RCLCPP_ERROR(logger_, "CV Bridge exception: %s", e.what());
+      return;
     }
 
     // Create a timestamped filename
@@ -67,9 +116,6 @@ public:
                 << std::setw(9) << std::setfill('0') << img.header.stamp.nanosec;
     std::string timestamp = ss_timestamp.str();
 
-    // Create the full file path with '.png' as the extension
-    std::string filepath = topic_dir_ + "/" + timestamp + ".png";
-
     // Ensure the directory exists, create if necessary
     std::filesystem::path dir_path = topic_dir_;
     if (!std::filesystem::exists(dir_path)) {
@@ -77,19 +123,25 @@ public:
       std::filesystem::create_directories(dir_path);
     }
 
-    // Normalize depth image for better visualization if needed
-    cv::Mat depth_image;
-    if (encoding_ == "16UC1") {
-      cv_ptr->image.convertTo(depth_image, CV_16UC1);  // No normalization applied here
+    // Process and save the image based on encoding
+    cv::Mat output_image;
+    if (isColorEncoding(encoding_) || isGrayscaleEncoding(encoding_)) {
+      output_image = convertDepthToVisualization(cv_ptr->image);
     } else {
-      depth_image = cv_ptr->image;  // Handle other encodings
+      // For raw depth, keep original
+      output_image = cv_ptr->image;
     }
 
-    // Write the depth image to disk
-    if (!cv::imwrite(filepath, depth_image)) {
-      RCLCPP_ERROR(logger_, "Failed to write depth image to %s", filepath.c_str());
+    // Create the full file path
+    std::string filepath = topic_dir_ + "/" + timestamp + ".png";
+
+    // Save the image
+    if (cv::imwrite(filepath, output_image)) {
+      RCLCPP_INFO(logger_, "Processing depth image #%zu: SAVED to %s",
+                  index, filepath.c_str());
     } else {
-      RCLCPP_INFO(logger_, "Successfully wrote depth image to %s", filepath.c_str());
+      RCLCPP_ERROR(logger_, "Processing depth image #%zu: FAILED to save to %s",
+                   index, filepath.c_str());
     }
   }
 
